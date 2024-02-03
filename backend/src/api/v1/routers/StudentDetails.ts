@@ -1,6 +1,8 @@
 import {Router, Request, Response} from 'express';
 import Student from '../schema/StudentDetails';
 import { jwtAuthMiddleware } from '../middlewares/jwtAuthMiddleware';
+import { ApiError } from '../utils/ApiError';
+import { ApiResponse } from '../utils/ApiResponse';
 
 const router = Router();
 
@@ -8,7 +10,7 @@ router.post('/', jwtAuthMiddleware ,async(req:Request, res:Response)=>{
     const {name ,std , stream, interest, skills, resume, userId }= req.body
     try{
     if (!name || !std || !interest){
-        return res.status(400).json({ error: "Details Missing!" });
+        throw new ApiError(400,"Please provide name,std and interest")
     }
     // save the data in database here
     const newStudent = new Student({
@@ -24,10 +26,10 @@ router.post('/', jwtAuthMiddleware ,async(req:Request, res:Response)=>{
       // Save the new student to the database
       await newStudent.save();
   
-      return res.status(201).json({ message: "Student created successfully", data: newStudent });
+      return res.status(201).json(new ApiResponse(201,newStudent,"Student Created Succesfully"));
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Internal Server Error" });
+      throw new ApiError(501,"Internal Server Error");
     }
 })
 
@@ -37,7 +39,7 @@ router.get('/',jwtAuthMiddleware,async(req: Request, res:Response)=>{
     return res.status(400).send({ error: "Missing prompt or userId field" });
   }
    const students =await Student.findOne({userId});
-   if(!students) return res.status(404).json('No Data found');
+   if(!students) throw new ApiError(404,"Student not found");
     else {
       return res.status(200).json(students);
     }

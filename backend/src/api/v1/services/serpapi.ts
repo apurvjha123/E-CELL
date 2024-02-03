@@ -1,10 +1,11 @@
 import { SerpAPILoader } from "langchain/document_loaders/web/serpapi";
+import { ApiError } from "../utils/ApiError";
 
 export const searchToDocs = async (question: string) => {
   const apiKey = process.env.SERP_API_KEY;
 
   if (!apiKey) {
-    return `Error: SERP API Key is not provided.`;
+    throw new ApiError(400,"Api Key not found");
   }
   // Use SerpAPILoader to load web search results
   const loader = new SerpAPILoader({ q: question, apiKey });

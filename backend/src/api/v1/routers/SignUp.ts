@@ -2,30 +2,29 @@ import { Request, Router, Response } from "express";
 import { hashPassword } from "../services/hashPassword";
 import Signup from "../schema/Signup";
 import jwt from 'jsonwebtoken';
+import { ApiError } from "../utils/ApiError";
 
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
   const secretKey: string | undefined = process.env.JWT_SECRET_KEY;
-  if (!secretKey) return res.status(500).send("Server Error");
+  if (!secretKey) throw new ApiError(500,"Server Error");
   const { email, username, password } = req.body;
   if (!email || !username || !password)
-    return res.status(404).json("Details not Found !");
+   throw new ApiError(404,'Please provide email , username , password')
   // Checking the length of user inputs
   else if (email.length < 5 || username.length < 2) {
-    return res.status(401).json("Username and Email must be more char");
+    throw new ApiError(401,"Please provide Username and email of required length")
   }
   // Validate email format
   if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,})+$/.test(email)) {
-    return res.status(400).json({
-      message: "Please enter a valid email address",
-    });
+    throw new ApiError(401,"Please enter a valid email address");
   }
 
   try {
     const existingUser = await Signup.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: "User already exists!" });
+      throw new ApiError(400,"User already exists");
     }
     // Checking password special character
     if (

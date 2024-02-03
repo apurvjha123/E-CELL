@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { ApiError } from '../utils/ApiError';
 
 export const jwtAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const secretKey: string | undefined = process.env.JWT_SECRET_KEY;
 
   if (!secretKey) {
-    return res.status(500).send("Server Error");
+     throw new ApiError(400,"Secret key not found");
   }
 
   // Get the token from the request header
@@ -13,7 +14,7 @@ export const jwtAuthMiddleware = (req: Request, res: Response, next: NextFunctio
   console.log({token})
   // Check if the token is present
   if (!token) {
-    return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+    throw new ApiError(401,"Unauthorized Request")
   }
 
   try {
@@ -26,7 +27,7 @@ export const jwtAuthMiddleware = (req: Request, res: Response, next: NextFunctio
       req.body.userId = decoded.userId;
       next();
     } else {
-      return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+      throw new ApiError(404,"Invalid Access Token")
     }
   } catch (error) {
     return res.status(401).json({ error: 'Unauthorized - Invalid token' });
