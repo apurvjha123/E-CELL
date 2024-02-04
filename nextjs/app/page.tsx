@@ -1,10 +1,20 @@
 "use client"
 
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 
 const App = () => {
+  const [token, settoken] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const tokens: string | null = localStorage.getItem("token");
+      settoken(tokens);
+    } else {
+      alert("please login!")
+    }
+  }, []);
   return (
 <div className="bg-white overflow-hidden h-screen">
       <div className="flex flex-col md:flex-row">
@@ -26,9 +36,16 @@ const App = () => {
               journey. Your future begins here!
             </p>
           </div>
-          <Link href='/signin' className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg ml-5 md:ml-10  md:mb-0 md:mt-14">
+          {token?(
+            <Link href='/dashboard' className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg ml-5 md:ml-10  md:mb-0 md:mt-14">
             Try It Now
           </Link>
+          ):
+          (
+            <Link href='/signin' className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg ml-5 md:ml-10  md:mb-0 md:mt-14">
+            Try It Now
+          </Link>
+          )}
         </div>
         <div className="md:w-full">
           <img

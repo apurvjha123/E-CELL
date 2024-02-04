@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { signup } from '../api/register';
 import Loading from '@/components/Loading';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 
 const Page = () => {
@@ -147,12 +148,12 @@ const Page = () => {
           )}
           <p className="text-sm font-light text-gray-500 dark:text-gray-400">
             Already have an account?{" "}
-            <a
-              href="#"
+            <Link
+              href="/signin"
               className="text-sky-600 font-medium text-primary-600 hover:underline dark:text-primary-500"
             >
               Login here
-            </a>
+            </Link>
           </p>
         </form>
       </div>
